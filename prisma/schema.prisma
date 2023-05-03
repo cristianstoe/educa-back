@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  ID         Int      @id @default(autoincrement())
+  CPF        String   @unique
+  Nome       String
+  Username   String   @unique
+  Senha      String
+  Email      String   @unique
+  Celular    String   @unique
+  Assinatura Boolean  @default(false)
+  Curso      Curso[]
+  Trilha     Trilha[]
+}
+
+model Curso {
+  ID      Int             @id @default(autoincrement())
+  Nome    String
+  Tipo    String
+  Usuario Usuario         @relation(fields: [UserN], references: [Username])
+  UserN   String
+  Trilhas CursoNaTrilha[]
+  Aulas   Aula[]
+}
+
+model CursoNaTrilha {
+  Trilha   Trilha @relation(fields: [TrilhaID], references: [ID])
+  TrilhaID Int
+  Curso    Curso  @relation(fields: [CursoID], references: [ID])
+  CursoID  Int
+
+  @@id([CursoID, TrilhaID])
+}
+
+model Trilha {
+  ID      Int             @id @default(autoincrement())
+  Nome    String
+  Usuario Usuario         @relation(fields: [UserN], references: [Username])
+  UserN   String
+  Cursos  CursoNaTrilha[]
+}
+
+model Aula {
+  ID      Int    @id @default(autoincrement())
+  Nome    String
+  Curso   Curso  @relation(fields: [CursoID], references: [ID])
+  CursoID Int
+  Texto   Texto?
+  Video   Video?
+  Audio   Audio?
+}
+
+model Texto {
+  ID       Int    @id @default(autoincrement())
+  Assunto  String
+  Conteudo String
+  Aula     Aula   @relation(fields: [AulaID], references: [ID])
+  AulaID   Int    @unique
+}
+
+model Video {
+  ID       Int    @id @default(autoincrement())
+  Assunto  String
+  Conteudo String
+  Aula     Aula   @relation(fields: [AulaID], references: [ID])
+  AulaID   Int    @unique
+}
+
+model Audio {
+  ID       Int    @id @default(autoincrement())
+  Assunto  String
+  Conteudo String
+  Aula     Aula   @relation(fields: [AulaID], references: [ID])
+  AulaID   Int    @unique
+}
