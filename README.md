@@ -9,5 +9,5 @@
 - ```npx prisma migrate dev --name init```
 - Crie um .env no projeto e adicione
 - DATABASE_URL="<url>"
-
+- Para rodar: ```npm run dev```
 Agora seja feliz
