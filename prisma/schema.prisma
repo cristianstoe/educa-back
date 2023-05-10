@@ -24,13 +24,14 @@ model Usuario {
 }
 
 model Curso {
-  ID      Int             @id @default(autoincrement())
-  Nome    String
-  Tipo    String
-  Usuario Usuario         @relation(fields: [UserN], references: [Username])
-  UserN   String
-  Trilhas CursoNaTrilha[]
-  Aulas   Aula[]
+  ID        Int             @id @default(autoincrement())
+  Nome      String
+  Tipo      String
+  Usuario   Usuario         @relation(fields: [UserN], references: [Username])
+  UserN     String
+  Publicado Boolean         @default(false)
+  Trilhas   CursoNaTrilha[]
+  Aulas     Aula[]
 }
 
 model CursoNaTrilha {
@@ -43,43 +44,49 @@ model CursoNaTrilha {
 }
 
 model Trilha {
-  ID      Int             @id @default(autoincrement())
-  Nome    String
-  Usuario Usuario         @relation(fields: [UserN], references: [Username])
-  UserN   String
-  Cursos  CursoNaTrilha[]
+  ID        Int             @id @default(autoincrement())
+  Nome      String
+  Usuario   Usuario         @relation(fields: [UserN], references: [Username])
+  Publicado Boolean         @default(false)
+  UserN     String
+  Cursos    CursoNaTrilha[]
 }
 
 model Aula {
-  ID      Int    @id @default(autoincrement())
-  Nome    String
-  Curso   Curso  @relation(fields: [CursoID], references: [ID])
-  CursoID Int
-  Texto   Texto?
-  Video   Video?
-  Audio   Audio?
+  ID        Int     @id @default(autoincrement())
+  Nome      String
+  Curso     Curso?  @relation(fields: [CursoID], references: [ID])
+  CursoID   Int?
+  Publicado Boolean @default(false)
+  Texto     String
+  Video     String
+  Audio     String
+  Tags      String
 }
 
-model Texto {
-  ID       Int    @id @default(autoincrement())
-  Assunto  String
-  Conteudo String
-  Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
-}
+// model Texto {
+//   ID        Int     @id @default(autoincrement())
+//   Assunto   String
+//   Conteudo  String
+//   Aula      Aula    @relation(fields: [AulaID], references: [ID])
+//   AulaID    Int     @unique
+//   Publicado Boolean @default(false)
+// }
 
-model Video {
-  ID       Int    @id @default(autoincrement())
-  Assunto  String
-  Conteudo String
-  Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
-}
+// model Video {
+//   ID        Int     @id @default(autoincrement())
+//   Assunto   String
+//   Conteudo  String
+//   Aula      Aula    @relation(fields: [AulaID], references: [ID])
+//   AulaID    Int     @unique
+//   Publicado Boolean @default(false)
+// }
 
-model Audio {
-  ID       Int    @id @default(autoincrement())
-  Assunto  String
-  Conteudo String
-  Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
-}
+// model Audio {
+//   ID        Int     @id @default(autoincrement())
+//   Assunto   String
+//   Conteudo  String
+//   Aula      Aula    @relation(fields: [AulaID], references: [ID])
+//   AulaID    Int     @unique
+//   Publicado Boolean @default(false)
+// }
