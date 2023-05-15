@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Usuario" ALTER COLUMN "CPF" SET DATA TYPE TEXT;
