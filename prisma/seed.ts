@@ -1,62 +1,28 @@
 import { PrismaClient } from '@prisma/client'
-
-// initialize Prisma Client
+import { classes } from './seedclasses'
 
 const prisma = new PrismaClient()
 
-async function main() {
-  // create two dummy articles
+async function seed() {
+  try {
+    for (const aula of classes) {
+      await prisma.aula.create({
+        data: {
+          Nome: aula.Nome,
+          Texto: aula.Texto,
+          Video: aula.Video,
+          Audio: aula.Audio,
+          Tags: aula.Tags,
+        },
+      })
+    }
 
-  const post1 = await prisma.aula.upsert({
-    where: { ID: '1' },
-
-    update: {},
-
-    create: {
-      Nome: 'Teste 1',
-
-      Texto: 'Teste 1',
-
-      Audio: 'Teste 1',
-
-      Video: 'Teste 1',
-
-      Publicado: true,
-    },
-  })
-
-  const post2 = await prisma.aula.upsert({
-    where: { ID: '2' },
-
-    update: {},
-
-    create: {
-      Nome: 'Teste 2',
-
-      Texto: 'Teste 2',
-
-      Audio: 'Teste 2',
-
-      Video: 'Teste 2',
-
-      Publicado: true,
-    },
-  })
-
-  console.log({ post1, post2 })
+    console.log('Dados populados com sucesso!')
+  } catch (error) {
+    console.error('Erro ao popular dados:', error)
+  } finally {
+    await prisma.$disconnect()
+  }
 }
 
-// execute the main function
-
-main()
-  .catch((e) => {
-    console.error(e)
-
-    process.exit(1)
-  })
-
-  .finally(async () => {
-    // close Prisma Client at the end
-
-    await prisma.$disconnect()
-  })
+seed()
