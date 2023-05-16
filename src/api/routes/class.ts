@@ -58,7 +58,6 @@ function classRoutes(app, options, done) {
   // create new class
   app.post('/classes', async (request, reply) => {
     const { Nome, Texto, Video, Audio, Tags } = request.body
-    // find if class already exists
     const newClass: Aula = await prisma.aula.create({
       data: {
         Nome,
