@@ -1,12 +1,12 @@
 import fastify from 'fastify'
+import { classRoutes } from './api/routes/class'
+import { UsersRoute } from './api/routes/user'
 
 const app = fastify()
-const configurarRotas = require('./api/routes/trails')
-const classRoutes = require('./api/routes/class')
 
 // registrar a rota
-app.register(configurarRotas)
 app.register(classRoutes)
+app.register(UsersRoute)
 
 app
   .listen({

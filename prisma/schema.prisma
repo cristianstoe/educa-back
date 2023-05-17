@@ -5,13 +5,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Usuario {
-  ID         Int      @id @default(autoincrement())
+  ID         String   @id @default(uuid())
   CPF        String   @unique
   Nome       String
   Username   String   @unique

@@ -9,9 +9,6 @@ async function seed() {
       await prisma.aula.create({
         data: {
           Nome: aula.Nome,
-          Texto: aula.Texto,
-          Video: aula.Video,
-          Audio: aula.Audio,
           Tags: aula.Tags,
         },
       })

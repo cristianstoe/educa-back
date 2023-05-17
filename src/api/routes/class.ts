@@ -3,13 +3,10 @@ const prisma = new PrismaClient()
 
 interface Aula {
   Nome: string
-  Texto: string
-  Video: string
-  Audio: string
   Tags: string
 }
 
-function classRoutes(app, options, done) {
+export function classRoutes(app, options, done) {
   // get all classes publicadas
   app.get('/classes', async (request, reply) => {
     const classes = await prisma.aula.findMany({
@@ -57,14 +54,40 @@ function classRoutes(app, options, done) {
 
   // create new class
   app.post('/classes', async (request, reply) => {
-    const { Nome, Texto, Video, Audio, Tags } = request.body
+    const {
+      Nome,
+      CursoID,
+      TAssunto,
+      TConteudo,
+      AAssunto,
+      AConteudo,
+      VAssunto,
+      VConteudo,
+      Tags,
+    } = request.body
     const newClass: Aula = await prisma.aula.create({
       data: {
         Nome,
-        Texto,
-        Video,
-        Audio,
+        CursoID,
         Tags,
+        Texto: {
+          create: {
+            Assunto: TAssunto,
+            Conteudo: TConteudo,
+          },
+        },
+        Audio: {
+          create: {
+            Assunto: AAssunto,
+            Conteudo: AConteudo,
+          },
+        },
+        Video: {
+          create: {
+            Assunto: VAssunto,
+            Conteudo: VConteudo,
+          },
+        },
       },
     })
     reply.send(newClass)
@@ -127,4 +150,3 @@ function classRoutes(app, options, done) {
 
   done()
 }
-module.exports = classRoutes
