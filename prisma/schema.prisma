@@ -28,7 +28,7 @@ model Usuario {
 }
 
 model Curso {
-  ID        Int             @id @default(autoincrement())
+  ID        String          @id @default(uuid())
   Nome      String
   Tipo      String
   Usuario   Usuario         @relation(fields: [UserN], references: [Username])
@@ -40,15 +40,15 @@ model Curso {
 
 model CursoNaTrilha {
   Trilha   Trilha @relation(fields: [TrilhaID], references: [ID])
-  TrilhaID Int
+  TrilhaID String
   Curso    Curso  @relation(fields: [CursoID], references: [ID])
-  CursoID  Int
+  CursoID  String
 
   @@id([CursoID, TrilhaID])
 }
 
 model Trilha {
-  ID        Int             @id @default(autoincrement())
+  ID        String          @id @default(uuid())
   Nome      String
   Usuario   Usuario         @relation(fields: [UserN], references: [Username])
   Publicado Boolean         @default(false)
@@ -57,10 +57,10 @@ model Trilha {
 }
 
 model Aula {
-  ID        Int     @id @default(autoincrement())
+  ID        String  @id @default(uuid())
   Nome      String
   Curso     Curso   @relation(fields: [CursoID], references: [ID])
-  CursoID   Int
+  CursoID   String
   Texto     Texto?
   Video     Video?
   Audio     Audio?
@@ -69,25 +69,25 @@ model Aula {
 }
 
 model Texto {
-  ID       Int    @id @default(autoincrement())
+  ID       String @id @default(uuid())
   Assunto  String
   Conteudo String
   Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
+  AulaID   String @unique
 }
 
 model Video {
-  ID       Int    @id @default(autoincrement())
+  ID       String @id @default(uuid())
   Assunto  String
   Conteudo String
   Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
+  AulaID   String @unique
 }
 
 model Audio {
-  ID       Int    @id @default(autoincrement())
+  ID       String @id @default(uuid())
   Assunto  String
   Conteudo String
   Aula     Aula   @relation(fields: [AulaID], references: [ID])
-  AulaID   Int    @unique
+  AulaID   String @unique
 }

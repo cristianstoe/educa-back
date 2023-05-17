@@ -1,5 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import fastify from 'fastify'
+import dotenv from 'dotenv'
+import jwt from 'jsonwebtoken'
+
+dotenv.config()
 
 const prisma = new PrismaClient()
 const app = fastify({ logger: true })
@@ -37,12 +41,28 @@ export function cursoRoutes(app, options, done) {
   // create new curso
   app.post('/cursos', async (request, reply) => {
     const { Nome, Tipo } = request.body as Curso
-    const curso = await prisma.curso.create({
-      data: {
-        Nome,
-        Tipo,
-      },
-    })
-    reply.code(201).send(curso)
+    const authHeader = request.headers.authorization
+    if (!authHeader) {
+      return reply.code(401).send({ message: 'Missing authorization header' })
+    }
+    const token = authHeader.split(' ')[1]
+    // console.log(token)
+    try {
+      console.log(token)
+      const { userId } = jwt.verify(token, process.env.SECRET_KEY)
+
+      const curso = await prisma.curso.create({
+        data: {
+          Nome,
+          Tipo,
+          Usuario: { connect: { ID: userId } },
+        },
+      })
+
+      return reply.code(201).send(curso)
+    } catch (error) {
+      return reply.code(401).send({ message: 'Invalid token' }, error)
+    }
   })
+  done()
 }
