@@ -22,8 +22,7 @@ export function cursoRoutes(app, options, done) {
 
   // get curso by id
   app.get('/cursos/:ID', async (request, reply) => {
-    let { ID } = request.params
-    ID = parseInt(ID)
+    const { ID } = request.params
     const cursos = await prisma.curso.findUnique({
       where: {
         ID,

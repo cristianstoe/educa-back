@@ -36,8 +36,7 @@ export function classRoutes(app, options, done) {
 
   // get class by id
   app.get('/classes/:ID', async (request, reply) => {
-    let { ID } = request.params
-    ID = parseInt(ID)
+    const { ID } = request.params
     const classes = await prisma.aula.findUnique({
       where: {
         ID,
@@ -95,8 +94,7 @@ export function classRoutes(app, options, done) {
 
   // update class
   app.put('/classes/:ID', async (request, reply) => {
-    let { ID } = request.params
-    ID = parseInt(ID)
+    const { ID } = request.params
     const { Nome, Texto, Video, Audio, Tags } = request.body
 
     try {
@@ -127,8 +125,7 @@ export function classRoutes(app, options, done) {
 
   // delete class
   app.delete('/classes/:ID', async (request, reply) => {
-    let { ID } = request.params
-    ID = parseInt(ID)
+    const { ID } = request.params
     try {
       const classes: Aula = await prisma.aula.delete({
         where: {

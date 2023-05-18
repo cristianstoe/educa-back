@@ -16,8 +16,7 @@ export function UsersRoute(app, options, done) {
 
   // get user by id
   app.get('/users/:ID', async (request, reply) => {
-    let { ID } = request.params
-    ID = parseInt(ID)
+    const { ID } = request.params
     const users = await prisma.usuario.findUnique({
       where: {
         ID,
@@ -81,18 +80,84 @@ export function UsersRoute(app, options, done) {
     }
 
     const valid = bcrypt.compareSync(Senha, user.Senha)
-    console.log(valid)
     if (!valid) {
-      return reply.code(400).send({ message: 'Invalid password' })
+      return reply.code(400).send({ message: 'Invalid email or password' })
     }
 
     // Sign in user and generate token
     const token = jwt.sign({ userId: user.ID }, process.env.SECRET_KEY, {
-      expiresIn: '3h',
+      expiresIn: '24h',
     })
 
     // Retorna o token gerado para o usuário
     return reply.code(200).send({ token })
   })
+
+  // update user
+  app.put('/users/:ID', async (request, reply) => {
+    const { ID } = request.params
+    const { Nome, Email, Senha, CPF, Username, Celular } = request.body
+
+    const user = await prisma.usuario.findUnique({
+      where: {
+        ID,
+      },
+    })
+
+    if (!user) {
+      return reply
+        .code(404)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ message: 'User not found' })
+    }
+
+    const data = {
+      Nome,
+      Email,
+      CPF,
+      Username,
+      Celular,
+      Senha,
+    }
+
+    if (Senha) {
+      const salt = bcrypt.genSaltSync(10)
+      const hash = bcrypt.hashSync(Senha, salt)
+      data.Senha = hash
+    }
+
+    const updatedUser = await prisma.usuario.update({
+      where: {
+        ID,
+      },
+      data,
+    })
+
+    reply.code(200).send(updatedUser)
+  })
+
+  // delete user
+  app.delete('/users/:ID', async (request, reply) => {
+    const { ID } = request.params
+    const user = await prisma.usuario.findUnique({
+      where: {
+        ID,
+      },
+    })
+    if (!user) {
+      reply
+        .code(404)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ message: 'User not found' })
+    }
+
+    const deletedUser = await prisma.usuario.delete({
+      where: {
+        ID,
+      },
+    })
+    reply.code(200).send(deletedUser)
+  })
+
   done()
 }
