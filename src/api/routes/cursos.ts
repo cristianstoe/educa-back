@@ -63,5 +63,57 @@ export function cursoRoutes(app, options, done) {
       return reply.code(401).send({ message: 'Invalid token' }, error)
     }
   })
+
+  // update curso
+  app.put('/cursos/:ID', async (request, reply) => {
+    const { ID } = request.params
+    const { Nome, Tipo } = request.body as Curso
+    const authHeader = request.headers.authorization
+    if (!authHeader) {
+      return reply.code(401).send({ message: 'Missing authorization header' })
+    }
+    const token = authHeader.split(' ')[1]
+    try {
+      const { userId } = jwt.verify(token, process.env.SECRET_KEY)
+      const curso = await prisma.curso.update({
+        where: {
+          ID,
+        },
+        data: {
+          Nome,
+          Tipo,
+          Usuario: { connect: { ID: userId } },
+        },
+      })
+      return reply.code(200).send(curso)
+    } catch (error) {
+      return reply.code(401).send(error)
+    }
+  })
+
+  // delete curso
+  app.delete('/cursos/:ID', async (request, reply) => {
+    const { ID } = request.params
+    const authHeader = request.headers.authorization
+    if (!authHeader) {
+      return reply.code(401).send({ message: 'Missing authorization header' })
+    }
+    const token = authHeader.split(' ')[1]
+    try {
+      const { userId } = jwt.verify(token, process.env.SECRET_KEY)
+      // Delete associated CursoNaTrilha records first
+      await prisma.cursoNaTrilha.deleteMany({
+        where: { CursoID: ID },
+      })
+      // Delete the curso
+      const curso = await prisma.curso.delete({
+        where: { ID },
+      })
+      return reply.code(200).send(curso)
+    } catch (error) {
+      return reply.code(401).send(error)
+    }
+  })
+
   done()
 }

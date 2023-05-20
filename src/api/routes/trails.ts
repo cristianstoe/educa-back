@@ -97,15 +97,8 @@ export function trailRoutes(app, options, done) {
       })
 
       reply.code(201).send(trail)
-    } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          reply
-            .code(400)
-            .header('Content-Type', 'application/json; charset=utf-8')
-            .send({ error: 'Internal error' })
-        }
-      }
+    } catch (error) {
+      return reply.code(401).send(error)
     }
   })
 
@@ -119,20 +112,19 @@ export function trailRoutes(app, options, done) {
     const token = authHeader.split(' ')[1]
     try {
       const { userId } = jwt.verify(token, process.env.SECRET_KEY)
+      // Delete associated CursoNaTrilha records first
+      await prisma.cursoNaTrilha.deleteMany({
+        where: { TrilhaID: id },
+      })
+      // Delete the trail
       const trail = await prisma.trilha.delete({
         where: { ID: id },
       })
-      reply.code(201).send(trail)
+      reply.code(204).send(trail)
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          reply
-            .code(400)
-            .header('Content-Type', 'application/json; charset=utf-8')
-            .send({ error: 'Internal error' })
-        }
-      }
+      return reply.code(401).send(e)
     }
   })
+
   done()
 }
