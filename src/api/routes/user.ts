@@ -30,7 +30,6 @@ export function UsersRoute(app, options, done) {
     }
     reply.code(200).send(users)
   })
-
   // create new user
   app.post('/users', async (request, reply) => {
     const { Nome, Email, Senha, CPF, Username, Celular } = request.body
@@ -54,8 +53,19 @@ export function UsersRoute(app, options, done) {
       errors.push('Invalid password format')
     }
 
-    const salt = bcrypt.genSaltSync(10)
-    const hash = bcrypt.hashSync(Senha, salt)
+    // Verificar o CPF
+    const cpfRegex = /^\d{11}$/
+    if (!cpfRegex.test(CPF)) {
+      errors.push('Invalid CPF format')
+    }
+
+    // Verificar o número de celular
+    const celularRegex = /^\d{2}9\d{8}$/
+    if (!celularRegex.test(Celular)) {
+      errors.push(
+        'Invalid celular format. It should start with DDD and have 9 digits.',
+      )
+    }
 
     const existingUser = await prisma.usuario.findFirst({
       where: {
@@ -86,7 +96,7 @@ export function UsersRoute(app, options, done) {
         data: {
           Nome,
           Email,
-          Senha: hash,
+          Senha,
           CPF,
           Username,
           Celular,
