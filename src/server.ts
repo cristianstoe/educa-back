@@ -3,6 +3,9 @@ import { classRoutes } from './api/routes/class'
 import { UsersRoute } from './api/routes/user'
 import { cursoRoutes } from './api/routes/cursos'
 import { trailRoutes } from './api/routes/trails'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = fastify()
 app.register(require('@fastify/swagger'))
@@ -35,12 +38,11 @@ app.register(UsersRoute)
 app.register(cursoRoutes)
 app.register(trailRoutes)
 
-const start = async () => {
+const start = () => {
   try {
-    await app.listen({
-      port: 3000,
-    })
-    console.log('Server running')
+    const port = process.env.PORT || 3000
+    app.listen({ port })
+    console.log(`Server running on port ${port}`)
   } catch (err) {
     console.error('Error starting server:', err)
   }

@@ -57,15 +57,24 @@ export function UsersRoute(app, options, done) {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(Senha, salt)
 
-    const user = await prisma.usuario.findFirst({ where: { Email } })
-    if (user) {
-      errors.push('User already exists')
-    }
+    const existingUser = await prisma.usuario.findFirst({
+      where: {
+        OR: [{ Email }, { CPF }, { Username }],
+      },
+    })
 
-    // check if username already exists
-    const username = await prisma.usuario.findFirst({ where: { Username } })
-    if (username) {
-      errors.push('Username already exists')
+    if (existingUser) {
+      if (existingUser.Email === Email) {
+        errors.push('User with this email already exists')
+      }
+
+      if (existingUser.CPF === CPF) {
+        errors.push('User with this CPF already exists')
+      }
+
+      if (existingUser.Username === Username) {
+        errors.push('User with this username already exists')
+      }
     }
 
     if (errors.length > 0) {
