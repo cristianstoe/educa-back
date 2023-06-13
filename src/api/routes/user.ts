@@ -34,6 +34,27 @@ export function UsersRoute(app, options, done) {
   // create new user
   app.post('/users', async (request, reply) => {
     const { Nome, Email, Senha, CPF, Username, Celular } = request.body
+
+    // Verificar o nome
+    if (Nome.length > 40) {
+      return reply
+        .code(400)
+        .send({ message: 'Name exceeds maximum length of 40 characters' })
+    }
+
+    // Verificar o e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|br|org|net)$/
+    if (!emailRegex.test(Email)) {
+      return reply.code(400).send({ message: 'Invalid email format' })
+    }
+
+    // Verificar a senha
+    const passwordRegex =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,12}$/
+    if (!passwordRegex.test(Senha)) {
+      return reply.code(400).send({ message: 'Invalid password format' })
+    }
+
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(Senha, salt)
 
