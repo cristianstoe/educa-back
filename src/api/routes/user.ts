@@ -30,42 +30,11 @@ export function UsersRoute(app, options, done) {
     }
     reply.code(200).send(users)
   })
-  // create new user
+  const bcrypt = require('bcrypt')
+
+  // create
   app.post('/users', async (request, reply) => {
     const { Nome, Email, Senha, CPF, Username, Celular } = request.body
-    const errors = []
-
-    // Verificar o nome
-    if (Nome.length > 40) {
-      errors.push('Name exceeds maximum length of 40 characters')
-    }
-
-    // Verificar o e-mail
-    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|br|org|net)$/
-    if (!emailRegex.test(Email)) {
-      errors.push('Invalid email format')
-    }
-
-    // Verificar a senha
-    const passwordRegex =
-      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,12}$/
-    if (!passwordRegex.test(Senha)) {
-      errors.push('Invalid password format')
-    }
-
-    // Verificar o CPF
-    const cpfRegex = /^\d{11}$/
-    if (!cpfRegex.test(CPF)) {
-      errors.push('Invalid CPF format')
-    }
-
-    // Verificar o número de celular
-    const celularRegex = /^\d{2}9\d{8}$/
-    if (!celularRegex.test(Celular)) {
-      errors.push(
-        'Invalid celular format. It should start with DDD and have 9 digits.',
-      )
-    }
 
     const existingUser = await prisma.usuario.findFirst({
       where: {
@@ -73,35 +42,21 @@ export function UsersRoute(app, options, done) {
       },
     })
 
-    if (existingUser) {
-      if (existingUser.Email === Email) {
-        errors.push('User with this email already exists')
-      }
-
-      if (existingUser.CPF === CPF) {
-        errors.push('User with this CPF already exists')
-      }
-
-      if (existingUser.Username === Username) {
-        errors.push('User with this username already exists')
-      }
-    }
-
-    if (errors.length > 0) {
-      return reply.code(400).send({ errors })
-    }
-
     try {
+      const saltRounds = 10 // Número de rounds de hashing
+      const hashedPassword = await bcrypt.hash(Senha, saltRounds)
+
       const newUser = await prisma.usuario.create({
         data: {
           Nome,
           Email,
-          Senha,
+          Senha: hashedPassword,
           CPF,
           Username,
           Celular,
         },
       })
+
       return reply.code(201).send(newUser)
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
