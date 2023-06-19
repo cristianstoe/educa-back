@@ -38,16 +38,24 @@ app.register(UsersRoute)
 app.register(cursoRoutes)
 app.register(trailRoutes)
 
-const start = () => {
-  try {
-    const port = process.env.PORT || 3000
-    app.listen({ port })
-    console.log(`Server running on port ${port}`)
-  } catch (err) {
-    console.error('Error starting server:', err)
+// const start = () => {
+//   try {
+//     const port = process.env.PORT || 3000
+//     app.listen({ port, "0.0.0.0" })
+//     console.log(`Server running on port ${port}`)
+//   } catch (err) {
+//     console.error('Error starting server:', err)
+//   }
+// }
+
+// app.ready()
+
+// start()
+
+app.listen(process.env.PORT || 3000, '0.0.0.0', (err, address) => {
+  if (err) {
+    console.error(err)
+    process.exit(1)
   }
-}
-
-app.ready()
-
-start()
+  console.log(`Server listening at ${address}`)
+})
