@@ -44,6 +44,29 @@ export function trailRoutes(app, options, done) {
 
     try {
       const { userId } = jwt.verify(token, process.env.SECRET_KEY)
+
+      // Verificar se o nome possui entre 5 e 50 letras
+      if (Nome.length < 5 || Nome.length > 50) {
+        return reply
+          .code(400)
+          .send({ message: 'O nome deve ter entre 5 e 50 letras' })
+      }
+
+      // Verificar se o usuário existe
+      const userExists = await prisma.usuario.findUnique({
+        where: { ID: userId },
+      })
+      if (!userExists) {
+        return reply.code(404).send({ message: 'Usuário não encontrado' })
+      }
+
+      // Verificar se há pelo menos 1 curso
+      if (cursos.length < 1) {
+        return reply
+          .code(400)
+          .send({ message: 'Deve haver pelo menos 1 curso na trilha' })
+      }
+
       const trail = await prisma.trilha.create({
         data: {
           Nome,
@@ -61,7 +84,7 @@ export function trailRoutes(app, options, done) {
       reply.code(201).send(trail)
     } catch (error) {
       console.log(error)
-      reply.code(401).send({ message: 'Invalid token' })
+      reply.code(401).send({ message: 'Token inválido' })
     }
   })
 

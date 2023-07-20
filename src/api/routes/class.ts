@@ -18,6 +18,7 @@ export function classRoutes(app, options, done) {
   // get all classes
   app.get('/classes/all', async (request, reply) => {
     const classes = await prisma.aula.findMany()
+
     reply.send(classes)
   })
 

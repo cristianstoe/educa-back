@@ -4,53 +4,26 @@ import { UsersRoute } from './api/routes/user'
 import { cursoRoutes } from './api/routes/cursos'
 import { trailRoutes } from './api/routes/trails'
 import dotenv from 'dotenv'
+import fastifyCors from '@fastify/cors' // Import the '@fastify/cors' plugin with the correct package name
 
 dotenv.config()
 
 const app = fastify()
-app.register(require('@fastify/swagger'))
 
-app.register(require('@fastify/swagger-ui'), {
-  routePrefix: '/documentation',
-  uiConfig: {
-    docExpansion: 'full',
-    deepLinking: false,
-  },
-  uiHooks: {
-    onRequest: function (request, reply, next) {
-      next()
-    },
-    preHandler: function (request, reply, next) {
-      next()
-    },
-  },
-  staticCSP: true,
-  transformStaticCSP: (header) => header,
-  transformSpecification: (swaggerObject, request, reply) => {
-    return swaggerObject
-  },
-  transformSpecificationClone: true,
+// Register the '@fastify/cors' plugin to enable CORS
+app.register(fastifyCors, {
+  origin: '*', // Set this to allow requests from any origin. For production, use a specific origin or list of origins.
+  methods: ['GET', 'PUT', 'POST', 'DELETE'], // Set the allowed HTTP methods.
+  allowedHeaders: ['Content-Type', 'Authorization'], // Set the allowed request headers.
 })
 
-// Registrar as rotas
+app.register(require('@fastify/swagger'))
+
+// Rest of your route registrations...
 app.register(classRoutes)
 app.register(UsersRoute)
 app.register(cursoRoutes)
 app.register(trailRoutes)
-
-// const start = () => {
-//   try {
-//     const port = process.env.PORT || 3000
-//     app.listen({ port, "0.0.0.0" })
-//     console.log(`Server running on port ${port}`)
-//   } catch (err) {
-//     console.error('Error starting server:', err)
-//   }
-// }
-
-// app.ready()
-
-// start()
 
 app.listen(process.env.PORT || 3000, '0.0.0.0', (err, address) => {
   if (err) {
