@@ -146,5 +146,58 @@ export function classRoutes(app, options, done) {
     }
   })
 
+  // get specific properties of a class by id
+  app.get('/classes/:ID/properties', async (request, reply) => {
+    const { ID } = request.params
+    try {
+      const classes = await prisma.aula.findUnique({
+        where: {
+          ID,
+        },
+        select: {
+          Nome: true,
+          CursoID: true,
+          Texto: {
+            select: {
+              Assunto: true,
+              Conteudo: true,
+            },
+          },
+          Audio: {
+            select: {
+              Assunto: true,
+              Conteudo: true,
+            },
+          },
+          Video: {
+            select: {
+              Assunto: true,
+              Conteudo: true,
+            },
+          },
+          Tags: true,
+        },
+      })
+
+      if (!classes) {
+        reply
+          .code(404)
+          .header('Content-Type', 'application/json; charset=utf-8')
+          .send({ message: 'Class not found' })
+      }
+
+      reply.code(200).send(classes)
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          reply
+            .code(404)
+            .header('Content-Type', 'application/json; charset=utf-8')
+            .send({ error: 'Class not found' })
+        }
+      }
+    }
+  })
+
   done()
 }
